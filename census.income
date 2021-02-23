@@ -1,0 +1,977 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Basic Libraries\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "\n",
+    "#Data Visualization Libraries\n",
+    "import seaborn as sns\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df=pd.read_csv('adult_income.csv',  sep=',\\s')\n",
+    "df.columns=['age','workclass','fnlwgt','education','education_num','marital_status','occupation','relationship','race','sex','capital_gain','capital_loss','hours_per_week','native_country','income']\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.dtypes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Reamrk:-Listing down the columns.\n",
+    "\n",
+    "1. Numerical columns= [age,fnlwgt,education-num,capital-gain,capital-loss,capital-gain,capital-loss,hourse-per-week,income].\n",
+    "\n",
+    "2. caregorical columns=[worlkplace,education,marital-status,occupation,relationship,race,sex,native-country].\n",
+    "\n",
+    "3. All data type coorect with the vaue of data so not change in data type but income feature data type changed."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Remark:\n",
+    "\n",
+    "1. Here show no any missing value in the dataset because in the place of null value ? sign place.\n",
+    "2. Null value show by the NaN or no any value than total null value show in particular features.\n",
+    "3. Here firstly replace the ? sign with Nan than find out exaxt number of null value in particular columns."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Replacing the question mark with NaN\n",
+    "df = df.replace('?',np.nan ) \n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Checking for null values.\n",
+    "df.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Finding:-\n",
+    "\n",
+    "1. Null value present in three feature workclass,occupation ,native_country .\n",
+    "2. According to number of row 32560 missing value not in any featurs so either drop row or either fillup accoding to              datatype  of features.\n",
+    "3. Missing fillup value by mode because missing value present in categorical features."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Imputing the missing value with mode \n",
+    "\n",
+    "for col in ['workclass', 'occupation', 'native_country']:\n",
+    "    df[col].fillna(df[col].mode()[0], inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# To check missing value"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sns.heatmap(df.isnull())\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Summary statistics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Observation:\n",
+    "\n",
+    "1. In mostly feature mean is greater than or eqlua to median mean mostly numerical fetaure right right skewed.\n",
+    "2. Difference between 75% and max in capital_gain and capital_loss very huge seems to have outliers.\n",
+    "3. fnlwgt seems to have outliers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#check correlation\n",
+    "df.corr()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sns.heatmap(df.corr(),annot=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Observation:\n",
+    "\n",
+    "1. income negative correlated with fnlwgt.\n",
+    "2. fnlwgt feature negative correlated with all features so its drop before model training.\n",
+    "3. No any features higly correlated with each other means above than 0.5. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#drop fnlwgt beacuse  neagtive correlated with target feature.\n",
+    "df.drop(columns=['fnlwgt'], axis=1, inplace=True)\n",
+    "df.columns"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Exploring data variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for i in df.columns:\n",
+    "    print('>>>',i,'>>>',df[i].unique())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Listing down coulumns\n",
+    "#Numerical columns=[age,fnlwgt,education-num,capital-gain,capital-loss,capital-gain,capital-loss,hourse-per-week,income]\n",
+    "\n",
+    "#caregorical columns=[worlkplace,education,marital-status,occupation,relationship,race,sex,native-country]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Data Vislalization"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Start with output feature\n",
+    "# Converting target values to 0 and 1 \n",
+    "df['income']=df['income'].map({'<=50K':0,'>50K':1})"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(15,6))\n",
+    "sns.countplot(x='workclass', data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(15,8))\n",
+    "sns.scatterplot(x='workclass',y='hours_per_week',hue='income',data=df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# let's clean the data according to output\n",
+    "df['workclass'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['workclass'].replace({'Self-emp-not-inc':'Self-employed','Self-emp-inc':'Self-employed','Local-gov':'Gov-emp','State-gov':'Gov-emp','Federal-gov':'Gov-emp'},inplace=True)\n",
+    "df['workclass'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# we don't need the without pay and Newer worked, let's remove it\n",
+    "df = df[df['workclass'] != 'Without-pay']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = df[df['workclass'] != 'Never-worked']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['workclass'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(15,6))\n",
+    "sns.countplot(x='education', data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sns.catplot(x='education',y='education_num',data=df,kind='bar',aspect=4)\n",
+    "plt.xticks(rotation=40)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['education_num'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#9,10 HS(Higer Secondary), 11th,12th- SS(senior secondary), below 9th class - till 8\n",
+    "df['education'].replace({'11th':'SS','12th':'SS','9th':'HS','10th':'HS','Preschool':'till8','1st-4th':'till8','5th-6th':'till8','7th-8th':'till8'},inplace=True)\n",
+    "df['education'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(12,5))\n",
+    "sns.countplot('marital_status',data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['marital_status'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['marital_status'].replace({'Married-civ-spouse':'Married','Married-spouse-absent':'Married','Married-AF-spouse':'Married','Divorced':'Separated'},inplace=True)\n",
+    "df['marital_status'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(12,5))\n",
+    "sns.countplot('marital_status',data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['occupation'].hist(figsize=(18,5),bins=30)\n",
+    "plt.xticks(rotation=30)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['relationship'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(12,5))\n",
+    "sns.countplot('relationship',data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(12,5))\n",
+    "sns.countplot('race',data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.xticks(rotation='vertical')\n",
+    "df['native_country'].hist(figsize=(18,5),bins=30)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sns.countplot(x='sex', data=df,hue='income')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# For All numerical columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.hist(figsize=(16,16))\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Observation:\n",
+    "\n",
+    "1. Age distribution is a slightly right-skewed normal distribution with the bulk of the staff between 25 and 45 years.\n",
+    "2. capital gain more than 80000 seems to outliers and  right skewed.\n",
+    "3. capital_loss also seems to outliers and right skewed."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "(df['capital_gain']>80000).value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "(df['capital_loss']>2000).value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Check skewness"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.skew()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Lets treat the skewness\n",
+    "import numpy as np\n",
+    "df.skew()\n",
+    "for col in df.skew().index:\n",
+    "    if col in df.describe().columns:\n",
+    "        if df.skew().loc[col]>0.5:\n",
+    "            df[col]=np.sqrt(df[col])\n",
+    "        if df.skew().loc[col]<-0.5:\n",
+    "            df[col]=np.cbrt(df[col])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Again check skewness\n",
+    "df.skew()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Transform Non numeric columns into Numeric columns\n",
+    "\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "\n",
+    "le=LabelEncoder()\n",
+    "\n",
+    "for column in df.columns:\n",
+    "    if df[column].dtype==np.number:\n",
+    "        continue\n",
+    "    df[column]=le.fit_transform(df[column])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Plotting outliers"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for i in df.describe().columns:\n",
+    "    sns.boxplot(df[i])\n",
+    "    plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Removing Outliers"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from scipy.stats import zscore\n",
+    "z=np.abs(zscore(df))\n",
+    "z"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "threshold=3\n",
+    "print(np.where(z>3))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_new=df[(z<3).all(axis=1)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df=df_new\n",
+    "df.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Machine Learning algorithm"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Splitting the data into input and output variable.\n",
+    "x=df.drop(columns=['income'],axis=1)\n",
+    "x.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y=df['income']\n",
+    "y.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#checking the shape of input and target variable\n",
+    "print(x.shape,'\\t\\t',y.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Splitting the data into training and testing data\n",
+    "\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=.20,random_state=42,stratify=y)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Checking the shape\n",
+    "\n",
+    "print(x_train.shape,'\\t\\t',x_test.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Checking the shape\n",
+    "\n",
+    "print(y_train.shape,'\\t',y_test.shape)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Importing all the model Library\n",
+    "\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.naive_bayes import GaussianNB\n",
+    "from sklearn.svm import SVC\n",
+    "from sklearn.tree import DecisionTreeClassifier\n",
+    "from sklearn.neighbors import KNeighborsClassifier\n",
+    "\n",
+    "#Importing error metrics\n",
+    "from sklearn.metrics import accuracy_score,confusion_matrix,classification_report\n",
+    "from sklearn.model_selection import GridSearchCV,cross_val_score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Models with its best parameters not using beacuse dataset very huge and take much time.\n",
+    "\n",
+    "LR=LogisticRegression(random_state=42)\n",
+    "KNN=KNeighborsClassifier(n_neighbors=24)\n",
+    "SVC=SVC()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# All Algorithm by using for loop\n",
+    "\n",
+    "model=[LR,GaussianNB(),SVC,DecisionTreeClassifier()]\n",
+    "\n",
+    "\n",
+    "for m in model:\n",
+    "    m.fit(x_train,y_train)\n",
+    "    m.score(x_train,y_train)\n",
+    "    predm=m.predict(x_test)\n",
+    "    print('Accuracy score of',m,'is:')\n",
+    "    print(accuracy_score(y_test,predm))\n",
+    "    print(confusion_matrix(y_test,predm))\n",
+    "    print(classification_report(y_test,predm))\n",
+    "    print('*****************************************************************************************')\n",
+    "    print('\\n')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Cross Validate the models\n",
+    "\n",
+    "models=[LR,GaussianNB(),SVC,DecisionTreeClassifier(),KNN]\n",
+    "for m in models:\n",
+    "    score=cross_val_score(m,x,y,cv=10,scoring='accuracy')\n",
+    "    print(\"Model:\",m)\n",
+    "    print(\"Score:\",score)\n",
+    "    print('Mean Score:',score.mean())\n",
+    "    print(\"Standard deviation:\",score.std())\n",
+    "    print('************************************************************************************************')\n",
+    "    print('\\n')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.ensemble import AdaBoostClassifier\n",
+    "from sklearn.ensemble import GradientBoostingClassifier\n",
+    "from sklearn.ensemble import BaggingClassifier\n",
+    "from sklearn.ensemble import ExtraTreesClassifier"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# All Algorithm by using for loop\n",
+    "\n",
+    "model=[RandomForestClassifier(),AdaBoostClassifier(),GradientBoostingClassifier(),BaggingClassifier(),ExtraTreesClassifier()]\n",
+    "\n",
+    "\n",
+    "for m in model:\n",
+    "    m.fit(x_train,y_train)\n",
+    "    m.score(x_train,y_train)\n",
+    "    predm=m.predict(x_test)\n",
+    "    print('Accuracy score of',m,'is:')\n",
+    "    print(accuracy_score(y_test,predm))\n",
+    "    print(confusion_matrix(y_test,predm))\n",
+    "    print(classification_report(y_test,predm))\n",
+    "    print('*****************************************************************************************')\n",
+    "    print('\\n')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Cross Validate the models\n",
+    "\n",
+    "models=[RandomForestClassifier(),AdaBoostClassifier(),GradientBoostingClassifier(),BaggingClassifier(),ExtraTreesClassifier()]\n",
+    "for m in models:\n",
+    "    score=cross_val_score(m,x,y,cv=10,scoring='accuracy')\n",
+    "    print(\"Model:\",m)\n",
+    "    print(\"Score:\",score)\n",
+    "    print('Mean Score:',score.mean())\n",
+    "    print(\"Standard deviation:\",score.std())\n",
+    "    print('************************************************************************************************')\n",
+    "    print('\\n')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#GradientBoostClassifier with best result\n",
+    "\n",
+    "gbc=GradientBoostingClassifier(learning_rate=0.1,random_state=59,n_estimators=200)\n",
+    "gbc.fit(x_train,y_train)\n",
+    "gbc.score(x_train,y_train)\n",
+    "predgbc=gbc.predict(x_test)\n",
+    "print(accuracy_score(y_test,predgbc))\n",
+    "print(confusion_matrix(y_test,predgbc))\n",
+    "print(classification_report(y_test,predgbc))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Plotting Confusion Matrix for Gradient Boosting Classifier.\n",
+    "cm=confusion_matrix(y_test,predgbc)\n",
+    "sns.heatmap(cm,annot=True,cbar=False,cmap='Blues')\n",
+    "\n",
+    "plt.title(\"Confusion Matrix of Gradient Boosting Classifier\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#AUC_ROC Curve  and finding auc score\n",
+    "\n",
+    "from sklearn.metrics import roc_curve\n",
+    "from sklearn.metrics import roc_auc_score\n",
+    "y_pred_prob=gbc.predict_proba(x_test)[:,1]\n",
+    "fpr,tpr,thredholds=roc_curve(y_test,y_pred_prob)\n",
+    "plt.plot([0,1],[0,1],'k--')\n",
+    "plt.plot(fpr,tpr,label='Gradient Boosting Classifier')\n",
+    "plt.xlabel('False Positive Rate')\n",
+    "plt.ylabel('True Positive Rate')\n",
+    "plt.title('Gradient Boosting Classifier')\n",
+    "plt.show()\n",
+    "\n",
+    "auc_score=roc_auc_score(y_test,predgbc)\n",
+    "print(auc_score)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Saving this model\n",
+    "from sklearn.externals import joblib\n",
+    "\n",
+    "#Save the model as a pickle in a file\n",
+    "joblib.dump(gbc,'Adult_income_gbc.pkl')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
